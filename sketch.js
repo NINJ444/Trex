@@ -35,9 +35,13 @@ function draw()
 {
   background("lightgray");
 
+  //gerar número aleatório
+  var mega = Math.round(random(1,60));
+  console.log(mega);
+
   //velocidade do solo
   solo.velocityX = -2;
-  console.log(solo.x);
+  //console.log(solo.x);
 
   //reiniciar o solo
   if(solo.x<0){
@@ -45,7 +49,7 @@ function draw()
   }
 
   //fazer o trex pular
-  if(keyDown("space")){
+  if(keyDown("space") && trex.y >= 161.5){
     trex.velocityY = -10;
   }
 
@@ -56,9 +60,13 @@ function draw()
   trex.collide(soloinvisivel);
 
   //posição do trex no eixo y
-  console.log(trex.y);
+  //console.log(trex.y);
 
   drawSprites();
 
+}
+
+function gerarNuvens(){
+  
 }
 

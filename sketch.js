@@ -6,7 +6,8 @@ var Cacto1,Cacto2,Cacto3,Cacto4,Cacto5,Cacto6;
 var Pontos=0;
 var nuvens;
 var cactos;
-var PLAY=1;
+var START=1;
+var PLAY=2;
 var END=0;
 var estadodojogo=PLAY;
 //função de pré-carregamento
@@ -32,9 +33,6 @@ function setup()
   trex = createSprite(50,160,20,50);
   trex.addAnimation("trexCorrendo",trex_running);
   trex.scale = 0.5;
-  //sensor de colisão
-  trex.setCollider("circle",0,0,35);
-  trex.debug = false;
 
   //criar a borda
   edges = createEdgeSprites();
@@ -45,8 +43,8 @@ function setup()
   //criar solo invisivel
   soloinvisivel=createSprite(50,190,400,10);
   soloinvisivel.visible=false;
-   cactos=new Group();
-   nuvens=new Group();
+   cactos=new Group ();
+   nuvens=new Group ();
 }
 
 //desenho e animação
@@ -54,13 +52,11 @@ function draw()
 {
   background("white");
   text("pontos: "+Pontos,500,20);
-  
   if(estadodojogo===PLAY){
-  //contagem dos pontos
-  Pontos = Pontos + Math.round(frameCount/60);
   
   //velocidade do solo
-  solo.velocityX = -3;
+  solo.velocityX = -2;
+  //console.log(solo.x);
 
   //reiniciar o solo
   if(solo.x<0){
@@ -69,36 +65,30 @@ function draw()
 
   //fazer o trex pular
   if(keyDown("space") && trex.y >= 161.5){
-    trex.velocityY = -12;
+    trex.velocityY = -10;
   }
 
   //dar gravidade para o trex
   trex.velocityY = trex.velocityY + 0.5;
-  
-  //gerar nuvens e cactos 
   gerarCactos();
   gerarNuvens();
-
-  //verifica se o trex bate no cacto
-  if(cactos.isTouching(trex)){
-    estadodojogo = END;
-  }
 }
   else if(estadodojogo===END){
-    trex.velocityY = 0;
-    solo.velocityX = 0;
     cactos.setVelocityXEach(0);
-    nuvens.setVelocityXEach(0);
-    cactos.setLifetimeEach(-1);
-    nuvens.setLifetimeEach(-1);
   }
 //trex colide com o solo
   trex.collide(soloinvisivel);
+
+  //posição do trex no eixo y
+  //console.log(trex.y);
+
+  //chamar a função da nuvem
 
 //exibir o frameCount
 //console.log(frameCount);
 
   drawSprites();
+
 }
 
 function gerarNuvens(){
@@ -115,10 +105,10 @@ function gerarNuvens(){
   }
 }
 function gerarCactos(){
-if(frameCount%120===0){
+if(frameCount%60===0){
 var Cacto=createSprite(520,170,20,20);
 cactos.add(Cacto);
-Cacto.velocityX=-3;
+Cacto.velocityX=-2;
  //gerar número aleatório
  var N = Math.round(random(1,6));
 switch(N){

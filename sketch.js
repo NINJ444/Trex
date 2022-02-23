@@ -1,5 +1,5 @@
 //declaração das variáveis
-var trex, trex_running, edges;
+var trex, trex_running, edges, trex_collided;
 var solo, soloImg,soloinvisivel;
 var nuvem,nuvemimg;
 var Cacto1,Cacto2,Cacto3,Cacto4,Cacto5,Cacto6;
@@ -10,11 +10,14 @@ var START=1;
 var PLAY=2;
 var END=0;
 var estadodojogo=PLAY;
+var gameOver, gameOverImg, restart, restartImg;
+var somPulo, somMorte, somPonto;
 //função de pré-carregamento
 function preload()
 {
  nuvemimg=loadImage("cloud.png");
   trex_running = loadAnimation("trex1.png","trex2.png","trex3.png");
+  trex_collided = loadAnimation("trex_collided.png");
   soloImg = loadImage("ground2.png");
   Cacto1 = loadImage("obstacle1.png");
   Cacto2 = loadImage("obstacle2.png");
@@ -22,6 +25,12 @@ function preload()
   Cacto4 = loadImage("obstacle4.png");
   Cacto5 = loadImage("obstacle5.png");
   Cacto6 = loadImage("obstacle6.png");
+  gameOverImg = loadImage("gameOver.png");
+  restartImg = loadImage("restart.png");
+  somPulo = loadSound("jump.mp3");
+  somMorte = loadSound("die.mp3");
+  somPonto = loadSound("checkPoint.mp3");
+
 }
 
 //função de configuração
@@ -32,6 +41,7 @@ function setup()
   //criar o sprite do trex
   trex = createSprite(50,160,20,50);
   trex.addAnimation("trexCorrendo",trex_running);
+  trex.addAnimation("trexColide",trex_collided);
   trex.scale = 0.5;
 
   //criar a borda
@@ -45,6 +55,13 @@ function setup()
   soloinvisivel.visible=false;
    cactos=new Group ();
    nuvens=new Group ();
+
+   gameOver = createSprite(300,75);
+   gameOver.addImage(gameOverImg);
+   gameOver.scale = 0.5;
+   restart = createSprite(300,100);
+   restart.addImage(restartImg);
+   restart.scale = 0.5;
 }
 
 //desenho e animação
@@ -53,6 +70,12 @@ function draw()
   background("white");
   text("pontos: "+Pontos,500,20);
   if(estadodojogo===PLAY){
+    //contagem dos pontos
+    Pontos = Pontos + Math.round(frameCount/60);
+
+    //visibilidade do GameOver e Restart
+    gameOver.visible = false;
+    restart.visible = false;
   
   //velocidade do solo
   solo.velocityX = -2;
@@ -66,15 +89,33 @@ function draw()
   //fazer o trex pular
   if(keyDown("space") && trex.y >= 161.5){
     trex.velocityY = -10;
+    somPulo.play();
   }
 
   //dar gravidade para o trex
   trex.velocityY = trex.velocityY + 0.5;
   gerarCactos();
   gerarNuvens();
+
+  if(cactos.isTouching(trex)){
+    estadodojogo = END;
+    somMorte.play();
+  }
+
 }
   else if(estadodojogo===END){
+    trex.velocityY = 0
+    solo.velocityX = 0;
     cactos.setVelocityXEach(0);
+    nuvens.setVelocityXEach(0);
+
+    cactos.setLifetimeEach(-1);
+    nuvens.setLifetimeEach(-1);
+    
+    gameOver.visible = true;
+    restart.visible = true;
+
+    trex.changeAnimation("trexColide",trex_collided);
   }
 //trex colide com o solo
   trex.collide(soloinvisivel);
